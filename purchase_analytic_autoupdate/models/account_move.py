@@ -44,10 +44,13 @@ class AccountMove(models.Model):
         to_write = []
         expense_lines = self.line_ids.filtered(lambda move: move.exclude_from_invoice_tab == True and move.account_id == account_id and move.product_id == product_id)
         for exp_line in expense_lines:
+            exp_line.product_id.standard_price = cost - 0.0 if not discount else (cost * (1.0/discount))
             to_write.append((1, exp_line.id, {
                         'price_unit': cost * -1,
                         'discount': discount,
                     }))
+            for analytic in exp_line.analytic_line_ids:
+                analytic.on_change_unit_amount()
 
         output_lines = self.line_ids.filtered(lambda move: move.exclude_from_invoice_tab == True and move.account_id == account_output_id and move.product_id == product_id)
         for out_line in output_lines:
