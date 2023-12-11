@@ -7,7 +7,10 @@ class PurchaseOrder(models.Model):
 
     def _sale_order_list(self):
         self.ensure_one()
-        return [x.strip() for x in self.origin.split(',')]
+        order_list = []
+        if self.origin:
+            order_list = [x.strip() for x in self.origin.split(',')]
+        return order_list
 
     def origin_sales_orders(self):
         self.ensure_one()
